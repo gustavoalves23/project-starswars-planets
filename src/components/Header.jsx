@@ -3,8 +3,8 @@ import MyContext from '../context/MyContext';
 
 function Header() {
   const [actualName, changeActualName] = useState('');
-  const changeNameFilter = useContext(MyContext);
-  useEffect(() => { changeNameFilter(actualName); }, [actualName, changeNameFilter]);
+  const { changeNameFilter } = useContext(MyContext);
+  useEffect(() => changeNameFilter(actualName), [actualName]);
   return (
     <div className="header">
       <input

@@ -1,59 +1,53 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import MyContext from './MyContext';
 import swAPI from '../services/swAPI';
+import runFilters from '../services/filters';
 
-class MyProvider extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      planetList: {},
-      loading: true,
-      filters: {
-        filterByName: {
-          name: '',
-        },
-      },
-    };
-    this.fetchAPI = this.fetchAPI.bind(this);
-    this.changeNameFilter = this.changeNameFilter.bind(this);
-  }
+function MyProvider({ children }) {
+  const [originalList, changeOriginalList] = useState({});
+  const [planetList, changePlanetList] = useState({});
+  const [loading, changeLoading] = useState(true);
+  const [filters, changeFilters] = useState({
+    filterByName: {
+      name: '',
+    },
+  });
 
-  fetchAPI() {
+  useEffect(() => {
+    changePlanetList(runFilters(filters, originalList));
+  }, [filters, originalList]);
+
+  function fetchAPI() {
     swAPI()
-      .then((planetList) => {
-        this.setState({
-          planetList,
-          loading: false,
-        });
+      .then((newPlanetList) => {
+        changeOriginalList(newPlanetList);
+        changePlanetList(newPlanetList);
+        changeLoading(false);
       });
   }
 
-  changeNameFilter(name) {
-    this.setState((previousState) => ({
-      filters: {
-        ...previousState.filters,
-        filterByName: {
-          name,
-        },
+  function changeNameFilter(name) {
+    changeFilters({
+      ...filters,
+      filterByName: {
+        name,
       },
-    }));
+    });
   }
 
-  render() {
-    const { children } = this.props;
-    return (
-      <MyContext.Provider
-        value={ {
-          ...this.state,
-          fetchAPI: this.fetchAPI,
-          changeNameFilter: this.changeNameFilter,
-        } }
-      >
-        { children }
-      </MyContext.Provider>
-    );
-  }
+  return (
+    <MyContext.Provider
+      value={ {
+        planetList,
+        loading,
+        fetchAPI,
+        changeNameFilter,
+      } }
+    >
+      { children }
+    </MyContext.Provider>
+  );
 }
 
 MyProvider.propTypes = {
