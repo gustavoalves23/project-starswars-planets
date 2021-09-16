@@ -3,20 +3,20 @@ import MyContext from '../context/MyContext';
 
 function Header() {
   const [actualName, changeActualName] = useState('');
-  const { filters, changeFilters, runFiltersCall } = useContext(MyContext);
+  const { changeFiltersState, runFiltersCall } = useContext(MyContext);
   const [actualColumn, changeActualColumn] = useState('population');
   const [actualComparsion, changeActualComparsion] = useState('maior que');
   const [actualValue, changeActualValue] = useState(0);
   useEffect(() => {
-    changeFilters((prevState) => ({
-      ...prevState.filters,
+    changeFiltersState((prevState) => ({
+      ...prevState,
       filterByName: { name: actualName },
     }));
-  }, [actualName]);
+  }, [actualName, changeFiltersState]);
 
   useEffect(() => {
-    changeFilters({
-      ...filters,
+    changeFiltersState((prevState) => ({
+      ...prevState,
       filterByNumericValues: [
         {
           column: actualColumn,
@@ -24,24 +24,8 @@ function Header() {
           value: actualValue,
         },
       ],
-    });
-  }, [actualColumn, actualComparsion, actualValue]);
-
-  const handleChange = ({ target: { name, value } }) => {
-    switch (name) {
-    case ('column'):
-      changeActualColumn(value);
-      break;
-    case ('comparison'):
-      changeActualComparsion(value);
-      break;
-    case ('value'):
-      changeActualValue(value);
-      break;
-    default:
-      console.log('default');
-    }
-  };
+    }));
+  }, [actualColumn, actualComparsion, actualValue, changeFiltersState]);
 
   return (
     <div className="header">
@@ -50,20 +34,28 @@ function Header() {
         data-testid="name-filter"
         onChange={ ({ target }) => changeActualName(target.value) }
       />
-      <select onChange={ handleChange } data-testid="column-filter" name="column">
+      <select
+        onChange={ ({ target }) => { changeActualColumn(target.value); } }
+        data-testid="column-filter"
+        name="column"
+      >
         <option value="population">population</option>
         <option value="orbital_period">orbital_period</option>
         <option value="diameter">diameter</option>
         <option value="rotation_period">rotation_period</option>
         <option value="surface_water">surface_water</option>
       </select>
-      <select onChange={ handleChange } data-testid="comparison-filter" name="comparison">
+      <select
+        onChange={ ({ target }) => { changeActualComparsion(target.value); } }
+        data-testid="comparison-filter"
+        name="comparison"
+      >
         <option value="maior que">maior que</option>
         <option value="menor que">menor que</option>
         <option value="igual a">igual a</option>
       </select>
       <input
-        onChange={ handleChange }
+        onChange={ ({ target }) => { changeActualValue(target.value); } }
         data-testid="value-filter"
         type="number"
         name="value"

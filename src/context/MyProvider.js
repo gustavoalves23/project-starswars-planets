@@ -49,6 +49,7 @@ function MyProvider({ children }) {
         fetchAPI,
         filters,
         changeFilters,
+        changeFiltersState,
         runFiltersCall,
       } }
     >
