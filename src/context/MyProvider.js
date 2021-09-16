@@ -2,20 +2,26 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import MyContext from './MyContext';
 import swAPI from '../services/swAPI';
-import runFilters from '../services/filters';
+import { runFilterByName, runFilters } from '../services/filters';
 
 function MyProvider({ children }) {
   const [originalList, changeOriginalList] = useState({});
-  const [planetList, changePlanetList] = useState({});
+  const [data, changePlanetList] = useState({});
   const [loading, changeLoading] = useState(true);
-  const [filters, changeFilters] = useState({
+  const [filters, changeFiltersState] = useState({
     filterByName: {
       name: '',
     },
+    filterByNumericValues: [
+      {
+        column: '',
+        comparison: '',
+        value: '',
+      },
+    ],
   });
-
   useEffect(() => {
-    changePlanetList(runFilters(filters, originalList));
+    changePlanetList(runFilterByName(filters, originalList));
   }, [filters, originalList]);
 
   function fetchAPI() {
@@ -27,22 +33,23 @@ function MyProvider({ children }) {
       });
   }
 
-  function changeNameFilter(name) {
-    changeFilters({
-      ...filters,
-      filterByName: {
-        name,
-      },
-    });
+  function changeFilters(newFilters) {
+    changeFiltersState(newFilters);
+  }
+
+  function runFiltersCall() {
+    changePlanetList(runFilters(filters, originalList));
   }
 
   return (
     <MyContext.Provider
       value={ {
-        planetList,
+        data,
         loading,
         fetchAPI,
-        changeNameFilter,
+        filters,
+        changeFilters,
+        runFiltersCall,
       } }
     >
       { children }
