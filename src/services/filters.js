@@ -13,9 +13,8 @@ const runFilterByName = (filters, movies) => {
 };
 
 const filterByValue = (data, movies) => {
-  const { column, comparsion, value } = data[0];
+  const { column, comparsion, value } = data;
   let actualOperator = '';
-  console.log(comparsion);
   switch (comparsion) {
   case 'maior que':
     actualOperator = 'greater';
@@ -41,7 +40,10 @@ const filterByValue = (data, movies) => {
 
 const runFilters = (filters, movies) => {
   const nameFilterReturn = runFilterByName(filters, movies);
-  const actualReturn = filterByValue(filters.filterByNumericValues, nameFilterReturn);
+  let actualReturn = nameFilterReturn;
+  filters.filterByNumericValues.forEach((element) => {
+    actualReturn = filterByValue(element, actualReturn);
+  });
   return (actualReturn);
 };
 

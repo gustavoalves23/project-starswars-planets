@@ -13,11 +13,6 @@ function MyProvider({ children }) {
       name: '',
     },
     filterByNumericValues: [
-      {
-        column: '',
-        comparison: '',
-        value: '',
-      },
     ],
   });
   useEffect(() => {
